@@ -1,0 +1,12 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+config PEANUT_BUZZER_PANIC
+	bool "User buzzer as panic"
+	default n
+	depends on ARCH_LEDS
+	---help---
+		This will use the buzzer as what would typically be a panic LED. The
+		buzzer will sound with 1Hz beeps when the board panics.
