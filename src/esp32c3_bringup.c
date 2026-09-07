@@ -108,6 +108,12 @@
 #  include "espressif/esp_nxdiag.h"
 #endif
 
+#ifdef CONFIG_SENSORS_BMP581
+#include <nuttx/i2c/i2c_master.h>
+#include <nuttx/sensors/bmp581.h>
+#include "espressif/esp_i2c.h"
+#endif
+
 #include "peanut.h"
 
 /****************************************************************************
@@ -139,6 +145,9 @@
 int esp_bringup(void)
 {
   int ret = OK;
+#ifdef CONFIG_SENSORS_BMP581
+  struct i2c_master_s *i2c0;
+#endif
 
 #ifdef CONFIG_FS_PROCFS
   /* Mount the procfs file system */
@@ -201,7 +210,7 @@ int esp_bringup(void)
 #endif
 
 #ifdef CONFIG_TIMER
-  ret = esp_timer_initialize(0);
+  ret = esp_timer_initialize(ESPRESSIF_I2C0);
   if (ret < 0)
     {
       _err("Failed to initialize Timer 0: %d\n", ret);
@@ -370,6 +379,25 @@ int esp_bringup(void)
     {
       syslog(LOG_ERR, "ERROR: esp_nxdiag_initialize failed: %d\n", ret);
     }
+#endif
+
+
+#ifdef CONFIG_SENSORS_BMP581
+  /* Register the BMP581 uORB sensor over I2C. */
+
+  i2c0 = esp_i2cbus_initialize(0);
+  if (i2c0 == NULL)
+    {
+      syslog(LOG_ERR, "Failed to get I2C0 interface.");
+      ret = -ENODEV;
+    }
+
+  ret = bmp581_register(i2c0, BMP581_I2CADDR_46, 0);
+  if (ret < 0)
+    {
+      syslog(LOG_ERR, "Failed to register BMP581: %d", ret);
+    }
+
 #endif
 
   /* If we got here then perhaps not all initialization was successful, but
