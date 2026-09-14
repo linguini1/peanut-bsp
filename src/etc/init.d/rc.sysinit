@@ -66,9 +66,17 @@ on init
  */
 
 on finalinit
-    start console             /* Start the shell */
+#ifdef CONFIG_EXAMPLES_TXMORSE
+    start jingle  /* Play startup jingle on the buzzer */
+#endif
+    start console /* Start the shell */
 
 service console sh
+
+#ifdef CONFIG_EXAMPLES_TXMORSE
+service jingle txmorse peanut /dev/gpio0
+    oneshot
+#endif
 
 /* Rocket altimeter logic services
  * TODO: A restart_period of 0 since these services are not meant to exit?
