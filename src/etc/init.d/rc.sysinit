@@ -46,19 +46,19 @@ on boot
 on init
 #ifdef CONFIG_ROCKETALT_FAKE_BARO
     start fakebaro /* Fake barometer data daemon for testing */
-#endif
+#endif /* CONFIG_ROCKETALT_PROCESSING */
 
 #ifdef CONFIG_ROCKETALT_PROCESSING
     class_start processing /* Start all the data processing topics */
-#endif
+#endif /* CONFIG_ROCKETALT_PROCESSING */
 
 #ifdef CONFIG_ROCKETALT_DEPLOYMENT
     start deployment /* Deployment control process */
-#endif
+#endif /* CONFIG_ROCKETALT_DEPLOYMENT */
 
 #ifdef CONFIG_ROCKETALT_LOGGER
     start logging /* Data logging process */
-#endif
+#endif /* CONFIG_ROCKETALT_LOGGER */
 
 /* At finalinit, our firmware stack should be running normally. Here we can do
  * anything that isn't critical for operation, like giving the user a nice shell
@@ -68,7 +68,7 @@ on init
 on finalinit
 #ifdef CONFIG_EXAMPLES_TXMORSE
     start jingle  /* Play startup jingle on the buzzer */
-#endif
+#endif /* CONFIG_EXAMPLES_TXMORSE */
     start console /* Start the shell */
 
 service console sh
@@ -76,7 +76,7 @@ service console sh
 #ifdef CONFIG_EXAMPLES_TXMORSE
 service jingle txmorse peanut /dev/gpio0
     oneshot
-#endif
+#endif /* CONFIG_EXAMPLES_TXMORSE */
 
 /* Rocket altimeter logic services
  * TODO: A restart_period of 0 since these services are not meant to exit?
@@ -88,7 +88,7 @@ service jingle txmorse peanut /dev/gpio0
 #ifdef CONFIG_ROCKETALT_FAKE_BARO
 service fakebaro fake_baro
     oneshot
-#endif
+#endif /* CONFIG_ROCKETALT_FAKE_BARO */
 
 #ifdef CONFIG_ROCKETALT_PROCESSING
 service altitude altitude_fusion
@@ -107,9 +107,15 @@ service events events_topic
 service batmon adcbat
     class processing
     oneshot
-#endif
+#endif /* CONFIG_ROCKETALT_PROCESSING_BATMON */
 
-#endif
+#ifdef CONFIG_ROCKETALT_PROCESSING_CONTMON
+service contmon continuity /dev/adc0 3 /dev/adc0 4
+    class processing
+    oneshot
+#endif /* CONFIG_ROCKETALT_PROCESSING_CONTMON */
+
+#endif /* CONFIG_ROCKETALT_PROCESSING */
 
 #ifdef CONFIG_ROCKETALT_DEPLOYMENT
 
@@ -125,4 +131,4 @@ service deployment deployment /dev/gpio1 /dev/gpio2
 #ifdef CONFIG_ROCKETALT_LOGGER
 service logging logger
     oneshot
-#endif
+#endif /* CONFIG_ROCKETALT_LOGGER */
