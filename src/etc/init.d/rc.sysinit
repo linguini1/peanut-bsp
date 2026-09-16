@@ -60,6 +60,16 @@ on init
     start logging /* Data logging process */
 #endif /* CONFIG_ROCKETALT_LOGGER */
 
+/* We need the network stack initialized in order to use the Bluetooth daemon.
+ */
+
+on netinit
+#ifdef CONFIG_ROCKETALT_BTDAEMON
+    ifup bnep0 /* Check that interface is up */
+    start ble  /* Bluetooth daemon */
+#endif /* CONFIG_ROCKETALT_BTDAEMON */
+
+
 /* At finalinit, our firmware stack should be running normally. Here we can do
  * anything that isn't critical for operation, like giving the user a nice shell
  * or displaying startup info.
@@ -132,3 +142,8 @@ service deployment deployment /dev/gpio1 /dev/gpio2
 service logging logger
     oneshot
 #endif /* CONFIG_ROCKETALT_LOGGER */
+
+#ifdef CONFIG_ROCKETALT_BTDAEMON
+service ble btdaemon bnep0
+    oneshot
+#endif /* CONFIG_ROCKETALT_BTDAEMON */
