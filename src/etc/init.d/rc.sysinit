@@ -112,9 +112,15 @@ service batmon adcbat
 #endif
 
 #ifdef CONFIG_ROCKETALT_DEPLOYMENT
-service deployment deployment
+
+/* Starting the deployment program with the two GPIO device paths as arguments
+ * tells the deployment daemon that gpio1 is pyro channel 1, and gpio2 is pyro
+ * channel 2.
+ */
+
+service deployment deployment /dev/gpio1 /dev/gpio2
     oneshot
-#endif
+#endif /* CONFIG_ROCKETALT_DEPLOYMENT */
 
 #ifdef CONFIG_ROCKETALT_LOGGER
 service logging logger
