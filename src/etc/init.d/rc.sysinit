@@ -44,9 +44,14 @@ on boot
  */
 
 on init
-#ifdef CONFIG_ROCKETALT_FAKE_BARO
-    start fakebaro /* Fake barometer data daemon for testing */
-#endif /* CONFIG_ROCKETALT_PROCESSING */
+#if defined(CONFIG_ROCKETALT_FAKE_BARO) && !defined(CONFIG_ROCKETALT_FAKE_BARO_USEBLE)
+    /* Start the fake barometer service on initialization only if we're not
+     * using the Bluetooth implementation. Bluetooth needs to wait for network
+     * initialization.
+     */
+
+    start fakebaro
+#endif /* CONFIG_ROCKETALT_FAKE_BARO && !CONFIG_ROCKETALT_FAKE_BARO_USEBLE */
 
 #ifdef CONFIG_ROCKETALT_PROCESSING
     class_start processing /* Start all the data processing topics */
@@ -68,6 +73,10 @@ on netinit
     ifup bnep0 /* Check that interface is up */
     start ble  /* Bluetooth daemon */
 #endif /* CONFIG_ROCKETALT_BTDAEMON */
+
+#if defined(CONFIG_ROCKETALT_FAKE_BARO_USEBLE)
+    start fakebaro /* Start Bluetooth fake barometer implementation */
+#endif /* CONFIG_ROCKETALT_FAKE_BARO_USEBLE */
 
 
 /* At finalinit, our firmware stack should be running normally. Here we can do
@@ -96,8 +105,26 @@ service jingle txmorse peanut /dev/gpio0
  */
 
 #ifdef CONFIG_ROCKETALT_FAKE_BARO
-service fakebaro fake_baro
+
+/* The fake barometer service has different arguments depending on the
+ * implementation that was selected.
+ */
+
+#ifdef CONFIG_ROCKETALT_FAKE_BARO_USECSV
+service fakebaro fake_baro -n 0 /data/baro.csv /* CSV barometer */
     oneshot
+#endif /* CONFIG_ROCKETALT_FAKE_BARO_USECSV */
+
+#ifdef CONFIG_ROCKETALT_FAKE_BARO_USEBLE
+service fakebaro fake_baro -n 0 bnep0 /* Bluetooth barometer */
+    oneshot
+#endif /* CONFIG_ROCKETALT_FAKE_BARO_USEBLE */
+
+#ifdef CONFIG_ROCKETALT_FAKE_BARO_USECURVE
+service fakebaro fake_baro -n 0 /* Curve barometer using defaults */
+    oneshot
+#endif /* CONFIG_ROCKETALT_FAKE_BARO_USECURVE */
+
 #endif /* CONFIG_ROCKETALT_FAKE_BARO */
 
 #ifdef CONFIG_ROCKETALT_PROCESSING
