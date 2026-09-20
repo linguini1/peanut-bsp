@@ -136,7 +136,7 @@ service velocity velocity_fusion
     class processing
     oneshot
 
-service events events_topic
+service events events_topic /data/config.conf
     class processing
     oneshot
 
@@ -161,7 +161,7 @@ service contmon continuity /dev/adc0 3 /dev/adc0 4
  * channel 2.
  */
 
-service deployment deployment /dev/gpio1 /dev/gpio2
+service deployment deployment /data/config.conf /dev/gpio1 /dev/gpio2
     oneshot
 #endif /* CONFIG_ROCKETALT_DEPLOYMENT */
 
