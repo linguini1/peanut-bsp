@@ -141,7 +141,7 @@ service events events_topic /data/config.conf
     oneshot
 
 #ifdef CONFIG_ROCKETALT_PROCESSING_BATMON
-service batmon adcbat /dev/adc0 2
+service batmon batmon /dev/adc0 2
     class processing
     oneshot
 #endif /* CONFIG_ROCKETALT_PROCESSING_BATMON */
