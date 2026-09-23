@@ -148,7 +148,7 @@ service events events_topic /data/config.conf
 #endif /* CONFIG_ROCKETALT_PROCESSING_EVENTS */
 
 #ifdef CONFIG_ROCKETALT_PROCESSING_ADCUORB
-service adc_uorb adc_uorb -n 0 -s /dev/adc0 4.2 12
+service adc_uorb adc_uorb -n 0 -s /dev/adc0 4.2 2100
     class processing
     oneshot
 #endif /* CONFIG_ROCKETALT_PROCESSING_ADCUORB */
